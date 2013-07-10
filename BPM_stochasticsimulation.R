@@ -5,27 +5,27 @@ set.seed(101)
 #Parameter values
 
 k=1000  #total no. inhabitable sites
-aBM=0.5 #attack rate of birds on berries
-aPM=0.6 #attack rate of pollinators on flowers
+aBM=0.3 #attack rate of birds on berries
+aPM=0.5 #attack rate of pollinators on flowers
 aBP=0.1 #attack rate of birds on pollinators
-cMB=0.01 #conversion of fruit to birds
-cMP=0.1 #conversion of flowers to pollinators
-cPB=0.1 #conversion of pollinators to birds
+cMB=0.0001 #conversion of fruit to birds
+cMP=0.01 #conversion of flowers to pollinators
+cPB=0.01 #conversion of pollinators to birds
 r=500 #mean no flowers per female mistletoe
 rsd=50 #sd of number of flowers per female mistletoe
-m=0.5 # mean flower to fruit conversion rate
-deP= 0.1 #extrinsic death rate of pollinators
+m=0.05 # mean flower to fruit conversion rate
+deP= 0.01 #extrinsic death rate of pollinators
 deB= 0.001 #extrinsic death rate of birds
 deM= 0.001 #extrinisic death rate of mistletoe
-deMp=0.9 #decay of unpollinated flowers
+deMp=0.8 #decay of unpollinated flowers
 deMb= 0.5 #decay of uneaten fruit
 h=1 #observation time step
 
 #Initiate time series
-times <- seq(1,1000,h)
+times <- seq(1,10000,h)
 
 #Initial conditions
-M.init <- 800
+M.init <- 100
 B.init <- 10
 P.init <- 100
 Mp.init <- 100
@@ -67,16 +67,16 @@ Est<- rep(0,length(times)-1)
 for (time in times[1:(length(times)-1)])
 {
   ###Think about whether it makes sense to have the state variables in the exp in this situaiton
-  Pollprob[time] <- 1-exp(-aPM*P[time]*h/Mp[time]) #pollination
+  Pollprob[time] <- 1-exp(-aPM*h) #pollination
   Poll[time] <- rbinom(1,Mp[time],Pollprob[time])
-  Dispprob[time] <- 1-exp(-aBM*B[time]*h/Mb[time]) #fruit dispersal
-  Disp[time] <- rbinom(1,Mb[time],Dispprob[time])
+ Dispprob[time] <- 1-exp(-aBM*h) #fruit dispersal
+ Disp[time] <- rbinom(1,Mb[time],Dispprob[time])
   Flconprob <- 1-exp(-cMP*h)
   Frconprob <- 1-exp(-cMB*h)
   Pollconprob <- 1-exp(-cPB*h)
   Flcon[time] <-  rbinom(1,Poll[time],Flconprob) #flower conversion to polls
   Frcon[time] <-  rbinom(1,Disp[time],Frconprob)  #fruit conversion to birs
-  Predprob[time] <- 1-exp(-aBP*h*B[time]/P[time])
+  Predprob[time] <- 1-exp(-aBP*h)
   Pred[time] <- rbinom(1,P[time],Predprob[time]) #pol pred
   Pollcon[time]<-  rbinom(1,Pred[time],Pollconprob)  #pols conversion to birds
   DeMprob <- 1-exp(-deM*h) #Mistletoe death
@@ -88,7 +88,7 @@ for (time in times[1:(length(times)-1)])
   DeMp[time] <- rbinom(1,(Mp[time]-Poll[time]),DeMpprob) #flower decay
   DeMb[time] <- rbinom(1,(Mb[time]-Disp[time]),DeMbprob) #fruit decay
   DeB[time] <- rbinom(1,B[time],DeBprob) #bird death
-  DeP[time] <- rbinom(1,P[time],DePprob) #pol death
+  DeP[time] <- rbinom(1,(P[time]-Pred[time]),DePprob) #pol death
   Fl[time] <- sum(round(rnorm(M[time],r*h,rsd*h))) #flowers formed 
   Matprob <- 1-exp(-m*h)
   Mat[time] <- rbinom(1,Poll[time],Matprob)#flower mature into fruit
@@ -100,7 +100,7 @@ for (time in times[1:(length(times)-1)])
   #Fruit=number before-number decayed-number dispersed+number formed
   Mb[time+1] <- Mb[time]-DeMb[time]-Disp[time]+Mat[time]
   #Mistletoe=number before +number established-number died
-  M[time+1] <- M[time]+Est[time]-DeM[time]
+  M[time+1] <- min(k, M[time]+Est[time])-DeM[time]
   #Birds=number before- number died + number born due to fruits eaten + number born due to polls eaten
   B[time+1] <- B[time]-DeB[time]+Frcon[time]+Pollcon[time]
   #Pollinators= number before + number born due to flowers pollinated -number died- number eaten
