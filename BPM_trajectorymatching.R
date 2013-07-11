@@ -8,18 +8,20 @@ source("BPM_determleastsquares.R")
 times <- seq(1,10000,h)
 
 #Parameter guesses
-aBMinit=0.1
-aPMinit=0.1
-aBPinit=0.1
-cMPinit=0.01
-cMBinit=0.01
-cPBinit=0.01
-dePinit=0.1
-deBinit=0.1
-deMinit=0.1
-deMpinit=0.1
-deMbinit=0.1
+aBMinit=0.5
+aPMinit=0.5
+aBPinit=0.5
+cMPinit=0.005
+cMBinit=0.1
+cPBinit=0.1
+dePinit=1
+deBinit=1
+deMinit=0.5
+deMpinit=0.5
+deMbinit=0.5
 
 #Optimize parameters in deterministic model for data generated using the stochastic model
 TM <- optim(c(aBMinit,aPMinit,aBPinit,cMBinit,cMPinit,cPBinit,dePinit,deBinit,deMinit,deMpinit,deMbinit),BPM_determresids,M=M,P=P,B=B,Mp=Mp,Mb=Mb,k=k,r=r,m=m,h=h,B.init=B.init,P.init=P.init,M.init=M.init,Mp.init=Mp.init,Mb.init=Mb.init,times=times)
 TM$par
+
+library(bbmle)
