@@ -1,7 +1,15 @@
-  BPMdeterm <- function(parms,inits,times){
-    parms <- c(k,aBM,aPM,aBP,cMB,cMP,cPB,r,m,deP,deB,deM,deMp,deMb,h)
-    inits <- c(B.init,P.init,M.init,Mp.init,Mb.init)
-    times <- seq(1,10000,h)
+  BPMdeterm <- function(parms,k,r,m,h,B.init,P.init,M.init,Mp.init,Mb.init,times){
+    aBM <- parms[1]
+    aPM <- parms[2]
+    aBP <- parms[3]
+    cMB <- parms[4]
+    cMP <- parms[5]
+    cPB <- parms[6]
+    deP <- parms[7]
+    deB <- parms[8]
+    deM <- parms[9]
+    deMp <- parms[10]
+    deMb <- parms[11]
     
   Fl <- rep(0,length(times)-1) #from mistletoe to mistletoe flowers
   Poll <- rep(0,length(times)-1) #pollination
@@ -20,16 +28,16 @@
   Dispprob<- rep(0,length(times)-1)
   Predprob<- rep(0,length(times)-1)
   Est<- rep(0,length(times)-1)
-  M.determ <- rep(0,length(times))
-  Mp.determ <- rep(0,length(times))
-  Mb.determ <- rep(0,length(times))
-  B.determ <- rep(0,length(times))
-  P.determ <- rep(0,length(times))
-  M.determ[1] <- M.init
-  Mp.determ[1] <- Mp.init
-  Mb.determ[1] <- Mb.init
-  B.determ[1] <- B.init
-  P.determ[1] <- P.init
+  M <- rep(0,length(times))
+  Mp <- rep(0,length(times))
+  Mb<- rep(0,length(times))
+  B <- rep(0,length(times))
+  P <- rep(0,length(times))
+  M[1] <- M.init
+  Mp[1] <- Mp.init
+  Mb[1] <- Mb.init
+  B[1] <- B.init
+  P[1] <- P.init
 
   Pollprob <- 1-exp(-aPM*h) #pollination
   Dispprob <- 1-exp(-aBM*h) #fruit dispersal
@@ -58,7 +66,7 @@
   DeP[time] <- (P[time]-Pred[time])*DePprob #pol death
   Fl[time] <- r*M[time] #flowers formed 
   Mat[time] <- Poll[time]*Matprob #flower mature into fruit
-  Est[time] <- Disp[time]*(1-M[time]/k))
+  Est[time] <- Disp[time]*(1-M[time]/k)
   
   #Flowers=number before-number decayed-number pollinated+number formed
   Mp[time+1] <- Mp[time]-DeMp[time]-Poll[time]+Fl[time]

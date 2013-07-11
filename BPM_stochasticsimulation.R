@@ -1,4 +1,4 @@
-rm(list = ls()) # Removes all objects from the console.
+
 set.seed(101)
 # Simulate stochastic population dynamics of bird, pollinator mistletoe (flowers and fruit explicit)
 
@@ -41,7 +41,7 @@ Mb <- rep(0,length(times))
 M[1] <- M.init
 B[1] <- B.init
 P[1] <- P.init
-Mp[1] <- Mb.init
+Mp[1] <- Mp.init
 Mb[1] <- Mb.init
 
 #Initiate Transitions 
